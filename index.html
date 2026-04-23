@@ -1,77 +1,183 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Render Table JSON</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Render Data (Table, List, Card)</title>
 
-        h2 {
-            text-align: center;
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f4f4f4;
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 60%;
-            margin: 20px auto;
-        }
+    h2 {
+        text-align: center;
+    }
 
-        th, td {
-            border: 1px solid #000;
-            padding: 10px;
-            text-align: center;
-        }
+    .container {
+        max-width: 900px;
+        margin: auto;
+    }
 
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-    </style>
+    .btn-group {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .list-item {
+        background: white;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
 </head>
 <body>
 
+<div class="container">
     <h2>Data Mahasiswa</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama</th>
-            </tr>
-        </thead>
-        <tbody id="data-table">
-            <!-- Data dari JS masuk sini -->
-        </tbody>
-    </table>
+    <div class="btn-group">
+        <button onclick="render('table')">Table</button>
+        <button onclick="render('list')">List</button>
+        <button onclick="render('card')">Card</button>
+    </div>
 
-    <script>
-        // Data JSON
-        const data = [
-            { id: 1, nama: "Andi" },
-            { id: 2, nama: "Budi" },
-            { id: 3, nama: "Citra" }
-        ];
+    <div id="app"></div>
+</div>
 
-        // Fungsi render (DRY & reusable)
-        function renderTable(data) {
-            const tableBody = document.getElementById("data-table");
-            tableBody.innerHTML = "";
+<script>
+// =========================
+// DATA (Single Source of Truth)
+// =========================
+const data = [
+    { id: 1, nama: "Andi" },
+    { id: 2, nama: "Budi" },
+    { id: 3, nama: "Citra" }
+];
 
-            data.forEach(item => {
-                tableBody.innerHTML += `
+// =========================
+// UTIL (Reusable Function)
+// =========================
+const clear = (el) => el.innerHTML = "";
+
+// =========================
+// VIEW COMPONENTS (Modular)
+// =========================
+
+const TableView = (data) => {
+    return `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(item => `
                     <tr>
                         <td>${item.id}</td>
                         <td>${item.nama}</td>
                     </tr>
-                `;
-            });
-        }
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+};
 
-        // Panggil fungsi
-        renderTable(data);
-    </script>
+const ListView = (data) => {
+    return data.map(item => `
+        <div class="list-item">
+            <strong>ID:</strong> ${item.id} <br>
+            <strong>Nama:</strong> ${item.nama}
+        </div>
+    `).join('');
+};
+
+const CardView = (data) => {
+    return `
+        <div class="card-container">
+            ${data.map(item => `
+                <div class="card">
+                    <h3>${item.nama}</h3>
+                    <p>ID: ${item.id}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+};
+
+// =========================
+// CONTROLLER (Scalable Logic)
+// =========================
+const views = {
+    table: TableView,
+    list: ListView,
+    card: CardView
+};
+
+function render(type) {
+    const app = document.getElementById('app');
+    clear(app);
+
+    // DRY: hanya panggil dari mapping
+    if (views[type]) {
+        app.innerHTML = views[type](data);
+    }
+}
+
+// =========================
+// INIT
+// =========================
+render('table');
+</script>
 
 </body>
 </html>
