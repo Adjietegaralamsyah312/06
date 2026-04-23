@@ -1,182 +1,173 @@
+html id="x9k3lm"
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Render Data (Table, List, Card)</title>
+    <meta charset="UTF-8">
+    <title>Render vs DRY Lengkap</title>
+    <style>
+        body { font-family: Arial; }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background: #f4f4f4;
-    }
+        h2 { text-align: center; }
 
-    h2 {
-        text-align: center;
-    }
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin: 20px auto;
+        }
 
-    .container {
-        max-width: 900px;
-        margin: auto;
-    }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
 
-    .btn-group {
-        text-align: center;
-        margin-bottom: 20px;
-    }
+        th {
+            background-color: green;
+            color: white;
+        }
 
-    button {
-        padding: 10px 15px;
-        margin: 5px;
-        border: none;
-        background: #4CAF50;
-        color: white;
-        cursor: pointer;
-        border-radius: 5px;
-    }
+        ul {
+            width: 60%;
+            margin: 20px auto;
+        }
 
-    button:hover {
-        background: #45a049;
-    }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
 
-    th, td {
-        border: 1px solid #000;
-        padding: 10px;
-        text-align: center;
-    }
-
-    th {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .list-item {
-        background: white;
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    .card-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-
-    .card {
-        background: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-</style>
+        .card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 150px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Data Mahasiswa</h2>
+<h2>TABLE 1 (Render Biasa)</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nama</th>
+        </tr>
+    </thead>
+    <tbody id="table-render"></tbody>
+</table>
 
-    <div class="btn-group">
-        <button onclick="render('table')">Table</button>
-        <button onclick="render('list')">List</button>
-        <button onclick="render('card')">Card</button>
-    </div>
+<h2>TABLE 2 (DRY, REUSE, MODULAR)</h2>
+<table>
+    <thead id="table-head"></thead>
+    <tbody id="table-dry"></tbody>
+</table>
 
-    <div id="app"></div>
-</div>
+<h2>LIST 1 (Dari Table 1)</h2>
+<ul id="list1"></ul>
+
+<h2>LIST 2 (Dari Table 2)</h2>
+<ul id="list2"></ul>
+
+<h2>CARD 1 (Dari Table 1)</h2>
+<div class="card-container" id="card1"></div>
+
+<h2>CARD 2 (Dari Table 2)</h2>
+<div class="card-container" id="card2"></div>
 
 <script>
-// =========================
-// DATA (Single Source of Truth)
-// =========================
+/* =====================
+   DATA
+===================== */
 const data = [
     { id: 1, nama: "Andi" },
     { id: 2, nama: "Budi" },
-    { id: 3, nama: "Citra" }
+    { id: 3, nama: "Citra" },
+    { id: 4, nama: "Dina" }
 ];
 
-// =========================
-// UTIL (Reusable Function)
-// =========================
-const clear = (el) => el.innerHTML = "";
+/* =====================
+   1. TABLE RENDER BIASA
+===================== */
+const tableRender = document.getElementById("table-render");
 
-// =========================
-// VIEW COMPONENTS (Modular)
-// =========================
-
-const TableView = (data) => {
-    return `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${data.map(item => `
-                    <tr>
-                        <td>${item.id}</td>
-                        <td>${item.nama}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+data.forEach(item => {
+    tableRender.innerHTML += `
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.nama}</td>
+        </tr>
     `;
-};
+});
 
-const ListView = (data) => {
-    return data.map(item => `
-        <div class="list-item">
-            <strong>ID:</strong> ${item.id} <br>
-            <strong>Nama:</strong> ${item.nama}
-        </div>
-    `).join('');
-};
+/* =====================
+   2. TABLE DRY MODULAR
+===================== */
+const columns = [
+    { key: "id", label: "ID" },
+    { key: "nama", label: "Nama" }
+];
 
-const CardView = (data) => {
-    return `
-        <div class="card-container">
-            ${data.map(item => `
-                <div class="card">
-                    <h3>${item.nama}</h3>
-                    <p>ID: ${item.id}</p>
-                </div>
-            `).join('')}
-        </div>
-    `;
-};
-
-// =========================
-// CONTROLLER (Scalable Logic)
-// =========================
-const views = {
-    table: TableView,
-    list: ListView,
-    card: CardView
-};
-
-function render(type) {
-    const app = document.getElementById('app');
-    clear(app);
-
-    // DRY: hanya panggil dari mapping
-    if (views[type]) {
-        app.innerHTML = views[type](data);
-    }
+function createHeader(cols) {
+    return `<tr>${cols.map(c => `<th>${c.label}</th>`).join("")}</tr>`;
 }
 
-// =========================
-// INIT
-// =========================
-render('table');
+function createRow(item, cols) {
+    return `<tr>${cols.map(c => `<td>${item[c.key]}</td>`).join("")}</tr>`;
+}
+
+function renderTable(data, cols) {
+    document.getElementById("table-head").innerHTML = createHeader(cols);
+    document.getElementById("table-dry").innerHTML =
+        data.map(d => createRow(d, cols)).join("");
+}
+
+renderTable(data, columns);
+
+/* =====================
+   LIST
+===================== */
+function createList(item) {
+    return `<li>${item.id} - ${item.nama}</li>`;
+}
+
+// List 1 (dari render biasa)
+document.getElementById("list1").innerHTML =
+    data.map(d => createList(d)).join("");
+
+// List 2 (dari DRY)
+document.getElementById("list2").innerHTML =
+    data.map(d => createList(d)).join("");
+
+/* =====================
+   CARD
+===================== */
+function createCard(item) {
+    return `
+        <div class="card">
+            <h3>${item.nama}</h3>
+            <p>ID: ${item.id}</p>
+        </div>
+    `;
+}
+
+// Card 1 (dari render biasa)
+document.getElementById("card1").innerHTML =
+    data.map(d => createCard(d)).join("");
+
+// Card 2 (dari DRY)
+document.getElementById("card2").innerHTML =
+    data.map(d => createCard(d)).join("");
+
 </script>
 
 </body>
