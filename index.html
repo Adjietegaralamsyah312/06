@@ -2,138 +2,76 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latihan DOM Vanilla JS - Muhammad Ilqi Muzaki</title>
+    <title>Render Table JSON</title>
     <style>
-        /* BAGIAN CSS (Tampilan) */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #e8f5e9; /* Warna hijau pucat sesuai nuansa tembok di foto */
-        }
-
-        .login-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            width: 320px;
-            text-align: center;
-            border: 1px solid #ddd;
+            font-family: Arial, sans-serif;
         }
 
         h2 {
-            margin-bottom: 20px;
-            color: #333;
+            text-align: center;
         }
 
-        .input-group {
-            text-align: left;
-            margin-bottom: 15px;
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin: 20px auto;
         }
 
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
-        input {
-            width: 100%;
+        th, td {
+            border: 1px solid #000;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box; /* Memastikan padding tidak merusak lebar */
+            text-align: center;
         }
 
-        .button-group {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        #BtnLogin {
-            background-color: #2e7d32;
+        th {
+            background-color: #4CAF50;
             color: white;
-        }
-
-        #BtnLogin:hover {
-            background-color: #1b5e20;
-        }
-
-        #BtnCancel {
-            background-color: #f44336;
-            color: white;
-        }
-
-        #BtnCancel:hover {
-            background-color: #d32f2f;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <h2>Login Form</h2>
-        
-        <div class="input-group">
-            <label for="U3">Username</label>
-            <input type="text" id="U3" placeholder="Masukkan Username">
-        </div>
+    <h2>Data Mahasiswa</h2>
 
-        <div class="input-group">
-            <label for="pass">Password</label>
-            <input type="password" id="pass" placeholder="Masukkan Password">
-        </div>
-
-        <div class="button-group">
-            <button id="BtnLogin">Login</button>
-            <button id="BtnCancel">Cancel</button>
-        </div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama</th>
+            </tr>
+        </thead>
+        <tbody id="data-table">
+            <!-- Data dari JS masuk sini -->
+        </tbody>
+    </table>
 
     <script>
-        /* BAGIAN JAVASCRIPT (Logika dari Papan Tulis) */
+        // Data JSON
+        const data = [
+            { id: 1, nama: "Andi" },
+            { id: 2, nama: "Budi" },
+            { id: 3, nama: "Citra" }
+        ];
 
-        // 1. DOM Selector (Mengambil elemen berdasarkan ID)
-        let btnLogin = document.getElementById("BtnLogin");
-        let btnCancel = document.getElementById("BtnCancel");
-        var us = document.getElementById("U3");
-        var ps = document.getElementById("pass");
+        // Fungsi render (DRY & reusable)
+        function renderTable(data) {
+            const tableBody = document.getElementById("data-table");
+            tableBody.innerHTML = "";
 
-        // 2. Event Listener (Menunggu aksi klik)
-        btnLogin.addEventListener("click", function() {
-            // 3. Logic / Value (Sesuai coretan papan tulis: US.value = "Username")
-            if (us.value === "") {
-                us.value = "Username"; // Mengisi otomatis jika kosong
-                alert("Field otomatis terisi!");
-            } else {
-                console.log("Data dikirim: " + us.value);
-                alert("Selamat datang, " + us.value + "!");
-            }
-        });
+            data.forEach(item => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.nama}</td>
+                    </tr>
+                `;
+            });
+        }
 
-        // Logika tambahan untuk tombol Cancel
-        btnCancel.onclick = function() {
-            us.value = "";
-            ps.value = "";
-            console.log("Form dibersihkan");
-        };
+        // Panggil fungsi
+        renderTable(data);
     </script>
+
 </body>
 </html>
